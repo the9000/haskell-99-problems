@@ -38,6 +38,22 @@ findBiasElement n range = (bias, subrange_left, subrange_right)
         extractSubrangeBounds Nothing = error ("Subrange not found for " ++ (show n))
         extractSubrangeBounds (Just (l, r)) = (l, r)
 
+{-| Finds the bias inside range relative to n.
+  * n: index we're looking at;
+  * range: the sparse map;
+  * acc: accumulator for recursion.
+
+  n-index    0  1 2     3 4 5 6          7  8  9  10  # no more
+  range: [  (1 -> 3),  (5  -> 8),       (12  ->   15)]
+  bias       1  1 1     2 2 2 2          5  5  5  5  undefined
+-}
+find2Bias :: Int -> I.Intmap -> Int -> Int
+find2Bias n range acc = do
+  scan_elt = I.lookupLE n range
+  if scan_elt is Nothing -> return acc
+  else l, r <- scan_elt; if n > r then acc += (r - n)
+
+
 findBias :: Maybe (Int, Int) -> I.IntMap Int -> Int -> Int
 findBias Nothing _ acc = acc
 findBias (Just (l, r)) range acc = unpacker prev
@@ -100,6 +116,7 @@ prop_splitRange_last start size =
   splitRange end (I.fromList [(start, end)]) start end  === I.fromList [(start, end-1)]
   where end = start + size - 1
 
+-- TODO: generate correct input, predicates fail too often.
 prop_splitRange_middle start size pos =
   size > 1 && (pos > start) && (pos < start + size - 2) ==>
   splitRange pos (I.fromList [(start, end)]) start end  ===
