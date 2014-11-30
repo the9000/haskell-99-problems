@@ -23,14 +23,14 @@ import Test.QuickCheck.All
 
 pickByIndices :: [a] -> [Int] -> [a]
 pickByIndices source indices = pickByIndices_ source_map indices
-  where source_map = I.fromList (zip [0..] source)
+  where source_map = I.fromAscList $ zip [0..] source
 
 pickByIndices_ :: I.IntMap a -> [Int] -> [a]
 pickByIndices_ _ [] = []
 pickByIndices_ source_map (n:ns) = ((I.!) source_map n) : pickByIndices_ source_map ns
 
 randomIndices :: StdGen -> Int -> [Int]
-randomIndices rgen size = randomIndices_ rgen size (Subrange 0 (size - 1))
+randomIndices rgen size = randomIndices_ rgen size $ Subrange 0 (size - 1)
 
 randomIndices_ :: StdGen -> Int -> SparseRange -> [Int]
 randomIndices_ _ 0 _ = []
@@ -38,10 +38,12 @@ randomIndices_ rgen size range = next_index : (randomIndices_ next_rgen next_siz
   where (next_index, next_range) = cutAt random_position range
         next_size = size - 1
         (random_value, next_rgen) = next rgen
-        (gen_low, gen_high) = genRange rgen
-        factor = fromIntegral size / fromIntegral (gen_high - gen_low)
         random_position = truncate (factor * fromIntegral random_value)
+        factor = fromIntegral size / fromIntegral (gen_high - gen_low)
+        (gen_low, gen_high) = genRange rgen
 
+pickRandomItems :: StdGen -> [a] -> [a]
+pickRandomItems rgen source = pickByIndices source $ randomIndices rgen $ length source
 
 -- quickCheckAll generates test cases for all 'prop_*' properties
 
