@@ -3,18 +3,7 @@
 import Test.QuickCheck
 import Test.QuickCheck.All
 
--- ## Find list but one element of list
+lastbut1 [x, y] = x
+lastbut1 (x:ys) = lastbut1 ys
 
-lbo :: [x] -> x
-lbo [] = error "Empty list"
-lbo [x] = error "One-element list"
-lbo [x, y] = x
-lbo (x:xs) = lbo xs  
-
-prop_lbo_2 x y = lbo [x, y] == x
-
-prop_lbo_n xs a b = lbo (xs ++ [a, b]) == a
-
-
--- quickCheckAll generates test cases for all 'prop_*' properties
-main = $(quickCheckAll)
+prop_lastbut1 = lastbut1 [1, 2, 3] = 2 
