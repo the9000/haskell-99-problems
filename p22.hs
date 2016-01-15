@@ -47,7 +47,8 @@ pickRandomItems rgen source = pickByIndices source $ randomIndices rgen $ length
 
 -- quickCheckAll generates test cases for all 'prop_*' properties
 
--- test splitRange
+-- test pickByIndices
 
+-- prop_EmptyIndicesMakeEmptyResult xs = pickByIndices [] xs === []
 
-{- 718 250 8000 -}
+-- main = $(quickCheckAll)
