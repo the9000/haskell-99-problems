@@ -9,8 +9,7 @@ On a change, only the path including the changed subrange is replaced.
 data SparseRange
   = EmptySubrange
   | Subrange Int Int -- [start::Int, end::Int)
-  | SplitRange Int Int SparseRange SparseRange
-    -- left_width right_width left right
+  | SplitRange Int Int SparseRange SparseRange -- left_width right_width left right
   deriving (Eq, Show)
 
 rangeLength :: SparseRange -> Int
@@ -41,6 +40,8 @@ cutAt_ pos (Subrange l r)
   | pos == (r - l) = (r, (r - l), flatSubrange l (r - 1))
   | otherwise = (l + pos, (len_l + len_r),
                  SplitRange len_l len_r subrange_l subrange_r)
+  -- ^ this case could be made nicer: instead of SplitRange (EmptySubrange, EmptySubrange)
+  -- it could return just EmptySubrange, using some normalization step.
   where subrange_l = flatSubrange l l_split
         subrange_r = flatSubrange r_split r
         l_split = l + pos - 1
